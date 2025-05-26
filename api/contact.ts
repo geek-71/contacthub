@@ -17,15 +17,15 @@ export default async function handler(
   const { name, email, message }: FormData = req.body;
 
   const auth = new google.auth.JWT(
-    import.meta.env.GOOGLE_CLIENT_EMAIL,
+    process.env.GOOGLE_CLIENT_EMAIL,
     undefined,
-    import.meta.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
     ['https://www.googleapis.com/auth/spreadsheets']
   );
 
   const sheets = google.sheets({ version: 'v4', auth });
 
-  const spreadsheetId = import.meta.env.GOOGLE_SHEET_ID;
+  const spreadsheetId = process.env.GOOGLE_SHEET_ID;
 
   try {
     await sheets.spreadsheets.values.append({
