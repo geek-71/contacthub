@@ -70,7 +70,7 @@ const ContactForm: React.FC = () => {
           body: JSON.stringify(formData),
         });
         const data = await res.json();
-        setSubmitStatus(data.message);
+        setSubmitStatus(data.status);
       
         // Reset success message after 5 seconds
         setTimeout(() => {
