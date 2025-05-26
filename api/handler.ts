@@ -1,4 +1,5 @@
 import { google } from 'googleapis';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 type FormData = {
   name: string;
@@ -7,8 +8,8 @@ type FormData = {
 };
 
 export default async function handler(
-  req:any,
-  res:any
+  req:VercelRequest,
+  res:VercelResponse
 ) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
