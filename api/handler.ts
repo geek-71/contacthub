@@ -1,46 +1,40 @@
-import { google } from 'googleapis';
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { google } from "googleapis"
 
 type FormData = {
-  name: string;
-  email: string;
-  message: string;
-};
+  name: string
+  email: string
+  message: string
+}
 
-export default async function handler(
-  req:VercelRequest,
-  res:VercelResponse
-) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
-  }
-
-  const { name, email, message }: FormData = req.body;
-
-  const auth = new google.auth.JWT(
-    process.env.GOOGLE_CLIENT_EMAIL,
-    undefined,
-    process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    ['https://www.googleapis.com/auth/spreadsheets']
-  );
-
-  const sheets = google.sheets({ version: 'v4', auth });
-
-  const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-
+export async function POST(request: Request) {
   try {
+    const { name, email, message }: FormData = await request.json()
+
+    const auth = new google.auth.JWT(
+      process.env.GOOGLE_CLIENT_EMAIL,
+      undefined,
+      process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      ["https://www.googleapis.com/auth/spreadsheets"],
+    )
+
+    const sheets = google.sheets({ version: "v4", auth })
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID
+
     await sheets.spreadsheets.values.append({
       spreadsheetId: spreadsheetId!,
-      range: 'Sheet1!A:D',
-      valueInputOption: 'USER_ENTERED',
+      range: "Sheet1!A:D",
+      valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [[name, email, message, new Date().toLocaleString()]],
       },
-    });
+    })
 
-    return res.status(200).json({ status:'sucess',message: 'Form submitted successfully!' });
+    return Response.json({
+      status: "success",
+      message: "Form submitted successfully!",
+    })
   } catch (err) {
-    console.error('Google Sheets Error:', err);
-    return res.status(500).json({status:'error', message: 'Error submitting form' });
+    console.error("Google Sheets Error:", err)
+    return Response.json({ status: "error", message: "Error submitting form" }, { status: 500 })
   }
 }
